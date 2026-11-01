@@ -149,8 +149,12 @@ async function init() {
   $("year").min = 1995; $("year").max = thisYear; $("year").value = thisYear - 5;
   try {
     const r = await fetch("/api/meta");
-    if (!r.ok) throw new Error((await r.json()).error || "Could not load the model.");
-    META = await r.json();
+    const text = await r.text();
+    let data;
+    try { data = JSON.parse(text); }
+    catch { throw new Error(`API returned HTML (HTTP ${r.status}). The Python function isn't running; check Vercel logs.`); }
+    if (!r.ok) throw new Error(data.error || "Could not load the model.");
+    META = data;
   } catch (e) {
     $("empty").innerHTML = `<span class="error">${e.message}</span>`;
     return;
@@ -174,7 +178,10 @@ $("form").addEventListener("submit", async e => {
   };
   try {
     const r = await fetch("/api/predict", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-    const d = await r.json();
+    const t = await r.text();
+    let d;
+    try { d = JSON.parse(t); }
+    catch { throw new Error(`API returned HTML (HTTP ${r.status}). The Python function isn't running; check Vercel logs.`); }
     if (!r.ok) throw new Error(d.error || "Prediction failed.");
     $("price").textContent = fmt(d.price);
     $("range").textContent = `Typical range ${fmt(d.low)} – ${fmt(d.high)}`;

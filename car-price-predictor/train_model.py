@@ -1,4 +1,14 @@
+"""Train the car price models locally and export what the Vercel API needs.
 
+Run once on your computer (and again whenever the dataset changes):
+
+    pip install -r requirements-train.txt
+    python train_model.py
+
+Needs the CarDekho CSV in this folder, saved as "car data.csv" or
+"CAR DETAILS FROM CAR DEKHO.csv". Writes api/model.joblib and api/meta.json,
+which you commit and deploy.
+"""
 import json
 import sys
 from pathlib import Path
@@ -33,7 +43,7 @@ def clean(df: pd.DataFrame) -> pd.DataFrame:
     df["owner"] = df["owner"].fillna(df["owner"].median())
     df["km_driven"] = df["km_driven"].fillna(df["km_driven"].median())
 
-    
+    # One CarDekho version prices cars in lakhs; convert to rupees.
     if df["selling_price"].median() < 1000:
         df["selling_price"] = df["selling_price"] * 100_000
 
@@ -54,7 +64,7 @@ def main() -> None:
     y = df["selling_price"]
     columns = list(X.columns)
 
-
+    # Plain numpy arrays: the API builds its input the same way, with no pandas needed at runtime.
     X_tr, X_te, y_tr, y_te = train_test_split(X.values.astype(float), y.values, test_size=0.2, random_state=42)
 
     models = {

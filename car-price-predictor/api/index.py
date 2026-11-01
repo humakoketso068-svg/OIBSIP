@@ -12,6 +12,7 @@ PUBLIC = HERE.parent / "public"
 
 app = Flask(__name__)
 
+
 try:
     MODEL = joblib.load(HERE / "model.joblib")
     META = json.loads((HERE / "meta.json").read_text())
@@ -60,8 +61,7 @@ def predict():
         if value not in options[key]:
             return jsonify(error=f"Unknown {key}: {value}"), 400
 
-    # Build the feature row in the exact column order used for training.
-    # The baseline category of each group (dropped in training) is simply all zeros.
+   
     numeric = {"car_age": this_year - year, "km_driven": km, "owner": owner}
     chosen = {f"{key}_{value}" for key, value in cats.items()}
     row = [numeric[c] if c in numeric else (1.0 if c in chosen else 0.0) for c in META["columns"]]

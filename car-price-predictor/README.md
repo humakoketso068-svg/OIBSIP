@@ -1,67 +1,47 @@
 # Car Price Predictor
 
-A small web app that guesses the selling price of a used car. You type in the brand, year, kilometres, fuel type, transmission, number of owners and seller type, and it gives you a price in rupees plus a rough range.
+Type in a used car's details and it tells you roughly what it should sell for. I made it for Task 3 of my data science internship.
 
-I built it for Task 3 of my data science internship. The model is trained on the CarDekho used car dataset from Kaggle (about 8,100 cars).
+It uses the CarDekho dataset from Kaggle, around 8,100 cars. You enter the brand, year, kilometres, fuel type, transmission, how many owners it's had and whether it's being sold by a dealer or an individual. Prices come out in rupees because that's what the dataset uses.
 
-## How it works
+## What I did
 
-I cleaned the data (removed duplicates, fixed the casing of values like "Petrol" and "petrol", filled in missing numbers), then worked out the car's age from its year and pulled the brand out of the car name. I trained three models: Linear Regression, Random Forest and Gradient Boosting. Random Forest did best, so that is the one the app uses.
+First I cleaned the data: dropped duplicate rows, made values like "Petrol" and "petrol" the same thing, and filled in the few missing numbers. Then I worked out each car's age from its year and took the brand from the first word of the car name.
 
-| Model | MAE | RMSE | R² |
-|---|---|---|---|
-| Random Forest | 129,804 | 245,273 | 0.73 |
-| Gradient Boosting | 130,494 | 252,139 | 0.71 |
-| Linear Regression | 167,713 | 312,830 | 0.55 |
+I tried Linear Regression, Random Forest and Gradient Boosting. Random Forest came out best (R² of 0.73, and it's off by about ₹130,000 on average), with Gradient Boosting very close behind at 0.71. Linear Regression was the worst at 0.55. The app uses the Random Forest.
 
-So on average the prediction is off by about ₹130,000. That is fine for a rough idea, but it won't replace a proper valuation. The model doesn't know about things like condition, accidents or the exact trim level.
+It's only a rough estimate. The model has no idea about the car's condition, accident history or trim, so don't treat the number as a real valuation.
 
-The page in `public/` is plain HTML, CSS and JavaScript. It sends the form to a small Flask API in `api/index.py`, which loads the saved model and returns the price.
+## How it's put together
 
-## Project layout
+The page in `public/index.html` is plain HTML, CSS and JavaScript. When you press the button it sends your details to a small Flask app in `api/index.py`, which loads the saved model (`api/model.joblib`) and sends back a price.
 
-```
-api/
-  index.py          Flask API (/api/meta and /api/predict)
-  model.joblib      the trained model
-  meta.json         dropdown options and scores
-public/
-  index.html        the page
-train_model.py      cleans the data and trains the models
-vercel.json         tells Vercel how to route /api
-requirements.txt    packages the API needs
-requirements-train.txt   packages for training
-```
+`train_model.py` is the script that cleans the data, trains the models and saves the best one.
 
-## Run it on your computer
+## Running it on your own computer
 
 ```
 pip install flask numpy scikit-learn joblib
 python api/index.py
 ```
 
-Then open http://127.0.0.1:3000 in your browser.
+Then go to http://127.0.0.1:3000.
 
-## Retrain the model
-
-Only needed if you change the dataset or the training code. Put the CarDekho CSV in the project folder (named `cardekho.csv` or `car data.csv`) and run:
+If you want to retrain it, put the CarDekho CSV in the folder (called `cardekho.csv` or `car data.csv`) and run:
 
 ```
 pip install -r requirements-train.txt
 python train_model.py
 ```
 
-This overwrites `api/model.joblib` and `api/meta.json`.
+That replaces `api/model.joblib` and `api/meta.json`.
 
-## Deploy on Vercel
+## Putting it on Vercel
 
-1. Push the project to a GitHub repo.
-2. On vercel.com choose Add New, then Project, import the repo and press Deploy. No settings need changing.
+Push the project to GitHub, then on vercel.com click Add New > Project, pick the repo and hit Deploy. You don't need to change any settings.
 
-Make sure `api/model.joblib` and `api/meta.json` are in the repo, otherwise the page will say the model is not available. The CSV is left out on purpose (see `.gitignore`).
+Make sure `model.joblib` and `meta.json` are in the repo. If they're missing the page says the model isn't available. The CSV is left out on purpose, check `.gitignore`.
 
-## Notes
+One more thing: scikit-learn is pinned to 1.9.1 in both requirements files. A saved model only loads properly on the same version it was trained with, so if you change one, retrain.
 
-- Prices are in Indian rupees because that is what the dataset uses.
-- The scikit-learn version is pinned to 1.9.1 in both requirements files. A saved model only loads reliably on the version that created it, so keep them the same.
-- Built with Python, pandas, scikit-learn, Flask and a bit of JavaScript.
+Made with Python, pandas, scikit-learn, Flask and a bit of JavaScript.

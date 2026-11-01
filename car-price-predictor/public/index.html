@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Car Price Predictor</title>
+<style>
+  :root {
+    --bg: #f5f6f8; --card: #ffffff; --text: #14181f; --muted: #5b6573;
+    --line: #e2e5ea; --accent: #0f766e; --accent-ink: #ffffff; --accent-soft: #ccfbf1; --err: #b42318;
+    --radius: 16px; --shadow: 0 1px 2px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0e1116; --card: #161b22; --text: #e8ecf1; --muted: #9aa5b3;
+      --line: #28303a; --accent: #2dd4bf; --accent-ink: #06201d; --accent-soft: #0f2f2c; --err: #f97066;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 24px 16px 48px; }
+  header { margin-bottom: 20px; }
+  h1 { font-size: clamp(1.6rem, 4vw + .5rem, 2.4rem); line-height: 1.15; margin: 0 0 6px; letter-spacing: -.02em; }
+  header p { margin: 0; color: var(--muted); max-width: 56ch; }
+
+  .grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
+  @media (min-width: 820px) { .grid { grid-template-columns: 1.15fr .85fr; align-items: start; } .result { position: sticky; top: 16px; } }
+
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; }
+  .card h2 { font-size: .85rem; margin: 0 0 16px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+
+  form { display: grid; gap: 16px; grid-template-columns: 1fr; }
+  @media (min-width: 520px) { form { grid-template-columns: 1fr 1fr; } .full { grid-column: 1 / -1; } }
+  label { display: block; font-weight: 600; font-size: .9rem; margin-bottom: 6px; }
+  select, input[type=number] {
+    width: 100%; min-height: 46px; padding: 10px 12px; font: inherit; color: var(--text);
+    background: var(--bg); border: 1px solid var(--line); border-radius: 10px;
+  }
+  select:focus, input:focus, button:focus-visible, .seg label:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .seg { display: flex; gap: 8px; flex-wrap: wrap; }
+  .seg label { flex: 1 1 0; margin: 0; min-width: 56px; }
+  .seg input { position: absolute; opacity: 0; pointer-events: none; }
+  .seg span {
+    display: block; text-align: center; padding: 11px 10px; min-height: 46px; font-weight: 600; font-size: .92rem;
+    border: 1px solid var(--line); border-radius: 10px; background: var(--bg); cursor: pointer; transition: .15s;
+  }
+  .seg input:checked + span { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  .row { display: flex; justify-content: space-between; align-items: baseline; }
+  output { font-variant-numeric: tabular-nums; color: var(--accent); font-weight: 700; }
+
+  button.primary { width: 100%; min-height: 50px; border: 0; border-radius: 12px; font: inherit; font-weight: 700; cursor: pointer; background: var(--accent); color: var(--accent-ink); }
+  button.primary:disabled { opacity: .6; cursor: progress; }
+
+  .price { font-size: clamp(2rem, 7vw, 3rem); font-weight: 800; letter-spacing: -.03em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .range { color: var(--muted); margin: 6px 0 18px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+  .chips li { font-size: .82rem; padding: 5px 10px; border-radius: 99px; background: var(--accent-soft); border: 1px solid var(--line); }
+  .chips b { color: var(--accent); }
+  .empty { color: var(--muted); }
+  .error { color: var(--err); font-weight: 600; }
+  .note { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--muted); font-size: .8rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Car Price Predictor</h1>
+    <p>Describe a used car and get an estimated selling price from a machine learning model trained on the CarDekho dataset.</p>
+  </header>
+
+  <div class="grid">
+    <section class="card" aria-labelledby="f-h">
+      <h2 id="f-h">Car details</h2>
+      <form id="form" autocomplete="off">
+        <div>
+          <label for="brand">Brand</label>
+          <select id="brand"></select>
+        </div>
+        <div>
+          <label for="year">Year of manufacture</label>
+          <input id="year" type="number" inputmode="numeric" required>
+        </div>
+
+        <div class="full">
+          <div class="row"><label for="km">Kilometres driven</label><output id="kmOut"></output></div>
+          <input id="km" type="range" min="0" max="300000" step="1000" value="60000">
+        </div>
+
+        <div class="full">
+          <label id="fuelL">Fuel type</label>
+          <div class="seg" role="radiogroup" aria-labelledby="fuelL" id="fuel"></div>
+        </div>
+
+        <div>
+          <label id="trL">Transmission</label>
+          <div class="seg" role="radiogroup" aria-labelledby="trL" id="trans"></div>
+        </div>
+        <div>
+          <label id="owL">Previous owners</label>
+          <div class="seg" role="radiogroup" aria-labelledby="owL" id="owner"></div>
+        </div>
+
+        <div class="full">
+          <label for="seller">Seller type</label>
+          <select id="seller"></select>
+        </div>
+
+        <div class="full"><button class="primary" id="go" type="submit" disabled>Estimate price</button></div>
+      </form>
+    </section>
+
+    <aside class="card result" aria-live="polite">
+      <h2>Estimated price</h2>
+      <div id="empty" class="empty">Loading model...</div>
+      <div id="out" hidden>
+        <div class="price" id="price"></div>
+        <div class="range" id="range"></div>
+        <ul class="chips" id="chips"></ul>
+        <p class="note" id="note"></p>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const thisYear = new Date().getFullYear();
+const fmt = n => "₹" + Math.round(n).toLocaleString("en-IN");
+const titleCase = s => s.replace(/\b\w/g, c => c.toUpperCase());
+const label = s => (s.length <= 3 ? s.toUpperCase() : titleCase(s));
+const checked = name => document.querySelector(`input[name=${name}]:checked`).value;
+
+function segmented(id, name, options, def) {
+  $(id).innerHTML = options.map(([v, text]) =>
+    `<label><input type="radio" name="${name}" value="${v}" ${v === def ? "checked" : ""}><span>${text}</span></label>`
+  ).join("");
+}
+function setKm() { $("kmOut").textContent = Number($("km").value).toLocaleString("en-US") + " km"; }
+$("km").addEventListener("input", setKm);
+
+let META = null;
+
+async function init() {
+  $("year").min = 1995; $("year").max = thisYear; $("year").value = thisYear - 5;
+  try {
+    const r = await fetch("/api/meta");
+    if (!r.ok) throw new Error((await r.json()).error || "Could not load the model.");
+    META = await r.json();
+  } catch (e) {
+    $("empty").innerHTML = `<span class="error">${e.message}</span>`;
+    return;
+  }
+  $("brand").innerHTML = META.brands.map(b => `<option value="${b}">${titleCase(b)}</option>`).join("");
+  $("seller").innerHTML = META.sellers.map(s => `<option value="${s}">${titleCase(s)}</option>`).join("");
+  segmented("fuel", "fuel", META.fuels.map(f => [f, label(f)]), META.fuels.includes("petrol") ? "petrol" : META.fuels[0]);
+  segmented("trans", "trans", META.transmissions.map(t => [t, titleCase(t)]), META.transmissions.includes("manual") ? "manual" : META.transmissions[0]);
+  segmented("owner", "owner", [["1","1"],["2","2"],["3","3"],["4","4+"]], "1");
+  $("km").value = Math.min(META.median_km, 300000); setKm();
+  $("go").disabled = false;
+  $("empty").innerHTML = "Fill in the details and press <b>Estimate price</b>.";
+}
+
+$("form").addEventListener("submit", async e => {
+  e.preventDefault();
+  const btn = $("go"); btn.disabled = true; btn.textContent = "Estimating...";
+  const body = {
+    brand: $("brand").value, year: Number($("year").value), km: Number($("km").value),
+    fuel: checked("fuel"), transmission: checked("trans"), seller_type: $("seller").value, owner: Number(checked("owner"))
+  };
+  try {
+    const r = await fetch("/api/predict", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || "Prediction failed.");
+    $("price").textContent = fmt(d.price);
+    $("range").textContent = `Typical range ${fmt(d.low)} – ${fmt(d.high)}`;
+    const age = thisYear - body.year;
+    $("chips").innerHTML = [
+      ["Age", age + (age === 1 ? " year" : " years")], ["Mileage", body.km.toLocaleString("en-US") + " km"],
+      ["Fuel", label(body.fuel)], ["Gearbox", titleCase(body.transmission)], ["Owners", body.owner === 4 ? "4+" : body.owner]
+    ].map(([k, v]) => `<li>${k}: <b>${v}</b></li>`).join("");
+    $("note").textContent = `Predicted by ${d.model} (R² ${d.r2.toFixed(2)} on held-out cars). The range is the model's average error. Prices are in Indian rupees, as in the CarDekho dataset.`;
+    $("empty").hidden = true; $("out").hidden = false;
+    if (window.matchMedia("(max-width: 819px)").matches) $("out").scrollIntoView({ behavior: "smooth", block: "start" });
+  } catch (err) {
+    $("out").hidden = true; $("empty").hidden = false;
+    $("empty").innerHTML = `<span class="error">${err.message}</span>`;
+  } finally {
+    btn.disabled = false; btn.textContent = "Estimate price";
+  }
+});
+
+init();
+</script>
+</body>
+</html>

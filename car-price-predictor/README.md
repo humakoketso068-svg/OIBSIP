@@ -1,51 +1,67 @@
-# Car Price Predictor (Vercel)
+# Car Price Predictor
 
-A responsive web app that predicts a used car's selling price.
+A small web app that guesses the selling price of a used car. You type in the brand, year, kilometres, fuel type, transmission, number of owners and seller type, and it gives you a price in rupees plus a rough range.
 
-* `public/index.html` is the responsive front end (static, served by Vercel).
-* `api/index.py` is a Flask API running as a Vercel Python function. It loads a pre-trained model and answers `/api/meta` and `/api/predict`.
-* `train_model.py` trains Linear Regression, Random Forest and Gradient Boosting on the CarDekho data and saves the best one to `api/model.joblib` and `api/meta.json`.
+I built it for Task 3 of my data science internship. The model is trained on the CarDekho used car dataset from Kaggle (about 8,100 cars).
 
-Vercel cannot run Streamlit (it needs a long-running server), so the model is trained once on your computer and Vercel only loads it.
+## How it works
 
-> **The model is already trained** on your `cardekho.csv` (Random Forest, R² 0.73, MAE about ₹130,000) and saved in `api/`.
-> You can skip step 1 and go straight to deploying. Only re-run `train_model.py` if you change the dataset or training code.
+I cleaned the data (removed duplicates, fixed the casing of values like "Petrol" and "petrol", filled in missing numbers), then worked out the car's age from its year and pulled the brand out of the car name. I trained three models: Linear Regression, Random Forest and Gradient Boosting. Random Forest did best, so that is the one the app uses.
 
-## 1. Train the model (on your computer, optional)
+| Model | MAE | RMSE | R² |
+|---|---|---|---|
+| Random Forest | 129,804 | 245,273 | 0.73 |
+| Gradient Boosting | 130,494 | 252,139 | 0.71 |
+| Linear Regression | 167,713 | 312,830 | 0.55 |
 
-1. Download the CarDekho dataset from Kaggle and save it in this folder as `car data.csv` (or `CAR DETAILS FROM CAR DEKHO.csv`).
-2. Run:
-   ```bash
-   pip install -r requirements-train.txt
-   python train_model.py
-   ```
-   This prints MAE, RMSE and R² for each model and creates `api/model.joblib` and `api/meta.json`. **Both files must be committed.**
+So on average the prediction is off by about ₹130,000. That is fine for a rough idea, but it won't replace a proper valuation. The model doesn't know about things like condition, accidents or the exact trim level.
 
-## 2. Try it locally (optional)
+The page in `public/` is plain HTML, CSS and JavaScript. It sends the form to a small Flask API in `api/index.py`, which loads the saved model and returns the price.
 
-```bash
-pip install -r requirements.txt
-python api/index.py        # open http://localhost:3000
+## Project layout
+
+```
+api/
+  index.py          Flask API (/api/meta and /api/predict)
+  model.joblib      the trained model
+  meta.json         dropdown options and scores
+public/
+  index.html        the page
+train_model.py      cleans the data and trains the models
+vercel.json         tells Vercel how to route /api
+requirements.txt    packages the API needs
+requirements-train.txt   packages for training
 ```
 
-## 3. Deploy to Vercel
+## Run it on your computer
 
-1. Push this folder to a GitHub repo. The CSV is git-ignored on purpose, and the trained model files are included.
-   ```bash
-   git init
-   git add .
-   git commit -m "Car price predictor"
-   git branch -M main
-   git remote add origin https://github.com/<your-username>/car-price-predictor.git
-   git push -u origin main
-   ```
-2. On [vercel.com](https://vercel.com): **Add New** → **Project** → import the repo → **Deploy**. No build settings are needed.
+```
+pip install flask numpy scikit-learn joblib
+python api/index.py
+```
 
-Or with the CLI: `npm i -g vercel`, then `vercel` in this folder.
+Then open http://127.0.0.1:3000 in your browser.
+
+## Retrain the model
+
+Only needed if you change the dataset or the training code. Put the CarDekho CSV in the project folder (named `cardekho.csv` or `car data.csv`) and run:
+
+```
+pip install -r requirements-train.txt
+python train_model.py
+```
+
+This overwrites `api/model.joblib` and `api/meta.json`.
+
+## Deploy on Vercel
+
+1. Push the project to a GitHub repo.
+2. On vercel.com choose Add New, then Project, import the repo and press Deploy. No settings need changing.
+
+Make sure `api/model.joblib` and `api/meta.json` are in the repo, otherwise the page will say the model is not available. The CSV is left out on purpose (see `.gitignore`).
 
 ## Notes
 
-* Re-run `train_model.py` and push again whenever you change the dataset or the training code.
-* Use the same `scikit-learn` version for training and deploying, because a saved model only loads reliably on the version that created it. Both requirements files pin it to `1.9.1`.
-* If the page says "Model not available", `api/model.joblib` and `api/meta.json` were not committed.
-* The Vercel function limit is about 250 MB unzipped. If `train_model.py` warns the model file is large, lower `n_estimators` for the Random Forest.
+- Prices are in Indian rupees because that is what the dataset uses.
+- The scikit-learn version is pinned to 1.9.1 in both requirements files. A saved model only loads reliably on the version that created it, so keep them the same.
+- Built with Python, pandas, scikit-learn, Flask and a bit of JavaScript.

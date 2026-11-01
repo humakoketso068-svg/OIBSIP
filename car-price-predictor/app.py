@@ -1,8 +1,4 @@
-"""Flask app for the car price predictor, deployed on Vercel (entrypoint: app.py).
 
-GET  /api/meta     -> options for the form dropdowns and model info
-POST /api/predict  -> {"price", "low", "high", "model", "r2"}
-"""
 import json
 from datetime import datetime
 from pathlib import Path
@@ -12,17 +8,17 @@ import numpy as np
 from flask import Flask, jsonify, request, send_from_directory
 
 HERE = Path(__file__).parent
-API_DIR = HERE / "api"  # model files live in api/
+API_DIR = HERE / "api"  
 PUBLIC = HERE / "public"
 
 app = Flask(__name__)
 
-# Loaded once per function instance (not on every request).
+
 try:
     MODEL = joblib.load(API_DIR / "model.joblib")
     META = json.loads((API_DIR / "meta.json").read_text())
     LOAD_ERROR = None
-except Exception as exc:  # model not trained or committed yet
+except Exception as exc: 
     MODEL, META, LOAD_ERROR = None, None, str(exc)
 
 
@@ -66,8 +62,7 @@ def predict():
         if value not in options[key]:
             return jsonify(error=f"Unknown {key}: {value}"), 400
 
-    # Build the feature row in the exact column order used for training.
-    # The baseline category of each group (dropped in training) is simply all zeros.
+    
     numeric = {"car_age": this_year - year, "km_driven": km, "owner": owner}
     chosen = {f"{key}_{value}" for key, value in cats.items()}
     row = [numeric[c] if c in numeric else (1.0 if c in chosen else 0.0) for c in META["columns"]]
@@ -77,7 +72,7 @@ def predict():
     return jsonify(price=price, low=max(price - mae, 0.0), high=price + mae, model=META["best"], r2=META["r2"])
 
 
-# Convenience for local runs (`python app.py`). On Vercel, public/ is served as static files.
+
 @app.get("/")
 def home():
     return send_from_directory(PUBLIC, "index.html")

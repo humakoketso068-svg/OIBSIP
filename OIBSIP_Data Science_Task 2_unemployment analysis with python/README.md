@@ -10,19 +10,18 @@ The main page, with the average unemployment rate across states and the lockdown
 
 Comparing a few regions month by month:
 
-![Compare regions](screenshots/Comparison by regions.png)
+![Compare regions](screenshots/02-compare-regions.png)
 
 The ten regions with the highest average, and how the three measures relate:
 
-![Top 10 regions and correlation table](screenshots/Highest on Average.png)
-
+![Top 10 regions and correlation table](screenshots/03-top10-and-correlation.png)
 The average by calendar month, with and without 2020:
 
-![Average by calendar month](screenshots/04-calendar-month.pn)
+![Average by calendar month](screenshots/04-calendar-month.png)
 
 Before and after the lockdown, for the ten regions where the average rose the most:
 
-![Pre-COVID vs post-COVID](screenshots/Pre covid.png)
+![Pre-COVID vs post-COVID](screenshots/05-before-after.png)
 
 ## What's in the folder
 

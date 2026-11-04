@@ -1,0 +1,35 @@
+:root{--bg:#EEF1F4;--ink:#1B2430;--mute:#5B6776;--line:#D5DBE2;--teal:#0E7C7B;--red:#C8382E;--gold:#F2B134;--panel:#16202C;--panel-ink:#E8EDF2}
+@media (prefers-color-scheme:dark){:root{--bg:#10161D;--ink:#E8EDF2;--mute:#97A3B1;--line:#26313D;--teal:#38B2AC;--red:#EF6A5E;--panel:#0A0F15}}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.6 "Public Sans",system-ui,sans-serif;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+h1,h2{font-family:"Bricolage Grotesque",system-ui,sans-serif;line-height:1.1;margin:0}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+header{padding:20px 0}
+header b{font:700 18px "Bricolage Grotesque",sans-serif}
+.hero{background:var(--panel);color:var(--panel-ink);border-radius:20px;padding:36px 32px 24px}
+.hero h1{font-size:clamp(30px,5vw,52px);max-width:16ch}
+.hero p{color:#9FB0C2;max-width:60ch;margin:12px 0 20px}
+.stats{display:flex;gap:36px;flex-wrap:wrap;margin:0 0 20px}
+.stats div span{display:block;font:700 28px "Bricolage Grotesque",sans-serif;color:var(--panel-ink)}
+.stats div small{color:#9FB0C2;font-size:13px}
+.stats .up span{color:var(--gold)}
+.cv{position:relative;height:340px}
+section{padding:56px 0 0}
+section h2{font-size:clamp(24px,3vw,34px);margin-bottom:6px}
+section>p,.row p,.note{color:var(--mute);max-width:64ch;margin:0 0 20px}
+.note{font-size:14px;margin-top:12px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:40px}
+@media(max-width:800px){.row{grid-template-columns:1fr}.hero{padding:26px 18px 16px}}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.chip{font:500 13px "Public Sans",sans-serif;border:1px solid var(--line);background:transparent;color:var(--ink);padding:6px 12px;border-radius:999px;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--teal);border-color:var(--teal);color:#fff}
+.chip:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.box{position:relative;height:380px}
+.box.short{height:300px}
+.box.tall{height:440px}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:12px 14px;text-align:center;border:2px solid var(--bg)}
+th{font-weight:600;color:var(--mute)}
+footer{padding:56px 0 40px;color:var(--mute);font-size:13px;max-width:70ch}

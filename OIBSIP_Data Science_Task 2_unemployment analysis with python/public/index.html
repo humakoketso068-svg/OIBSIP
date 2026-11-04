@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Unemployment in India, 2016 to 2021</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header><b>India unemployment dashboard</b></header>
+
+  <main>
+    <div class="hero">
+      <h1>What the lockdown did to jobs</h1>
+      <p id="lede">Loading the numbers...</p>
+      <div class="stats" id="stats"></div>
+      <div class="cv"><canvas id="c-hero" role="img" aria-label="Average monthly unemployment rate across states, with the lockdown marked"></canvas></div>
+    </div>
+
+    <section>
+      <h2>Compare states</h2>
+      <p>Tap a few states to see how each one moved, month by month.</p>
+      <div class="chips" id="chips"></div>
+      <div class="box"><canvas id="c-ts"></canvas></div>
+      <p class="note" id="n-ts"></p>
+    </section>
+
+    <section>
+      <div class="row">
+        <div>
+          <h2>Highest on average</h2>
+          <p>The ten states with the highest average rate over the whole period, COVID months included.</p>
+          <div class="box"><canvas id="c-top"></canvas></div>
+          <p class="note" id="n-top"></p>
+        </div>
+        <div>
+          <h2>Do the measures move together?</h2>
+          <p>How unemployment, employment and labour participation relate to each other.</p>
+          <div class="scroll"><table id="heat"></table></div>
+          <p class="note" id="n-heat"></p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Average by calendar month</h2>
+      <p>All the Januaries together, all the Februaries, and so on. The grey bars leave out 2020.</p>
+      <div class="box short"><canvas id="c-mon"></canvas></div>
+      <p class="note" id="n-mon"></p>
+    </section>
+
+    <section>
+      <h2>Before and after the lockdown</h2>
+      <p>The data is split at 25 March 2020. These are the ten states where the average rose the most.</p>
+      <div class="box tall"><canvas id="c-cmp"></canvas></div>
+      <p class="note" id="n-cmp"></p>
+    </section>
+  </main>
+
+  <footer>
+    <span id="source"></span> Source: the Kaggle dataset "Unemployment in India" (monthly totals, January 2016 to August 2021).
+    State averages aren't weighted by population, and a few states are missing some months.
+  </footer>
+</div>
+<script src="/app.js"></script>
+</body>
+</html>

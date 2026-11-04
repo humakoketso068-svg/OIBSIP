@@ -58,22 +58,7 @@ python -m flask --app app run
 
 Then open http://127.0.0.1:5000. I use `python -m` because the plain `pip` and `flask` commands were blocked on my laptop. If they work for you, you can use those.
 
-## Put it online with Vercel
 
-The easy way:
-
-1. Push this folder to a GitHub repository.
-2. Go to vercel.com/new and import the repository.
-3. Leave the settings as they are and click Deploy. Vercel spots the Flask app on its own.
-
-If you'd rather use the command line:
-
-```
-npm i -g vercel
-vercel
-```
-
-If the project sits inside a subfolder of a bigger repository, set the Root Directory to that subfolder when you import it.
 
 ## How it works
 

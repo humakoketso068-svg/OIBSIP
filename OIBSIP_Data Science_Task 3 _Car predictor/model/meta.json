@@ -1,0 +1,102 @@
+{
+  "best": "Gradient Boosting",
+  "results": {
+    "Linear Regression": {
+      "mae": 176243.6918907501,
+      "rmse": 347468.6482216952,
+      "r2": 0.5864948784926735
+    },
+    "Random Forest": {
+      "mae": 145347.32839956044,
+      "rmse": 319962.90766069683,
+      "r2": 0.6493701280635417
+    },
+    "Gradient Boosting": {
+      "mae": 138453.1997741302,
+      "rmse": 272660.3233249152,
+      "r2": 0.745379401725837
+    }
+  },
+  "columns": [
+    "car_age",
+    "km_driven",
+    "owner",
+    "brand_bmw",
+    "brand_chevrolet",
+    "brand_datsun",
+    "brand_fiat",
+    "brand_ford",
+    "brand_honda",
+    "brand_hyundai",
+    "brand_jaguar",
+    "brand_land rover",
+    "brand_mahindra",
+    "brand_maruti suzuki",
+    "brand_mercedes-benz",
+    "brand_mitsubishi",
+    "brand_nissan",
+    "brand_other",
+    "brand_renault",
+    "brand_skoda",
+    "brand_tata",
+    "brand_toyota",
+    "brand_volkswagen",
+    "fuel_diesel",
+    "fuel_lpg",
+    "fuel_petrol",
+    "seller_type_individual",
+    "seller_type_trustmark dealer",
+    "transmission_manual"
+  ],
+  "brands": [
+    "audi",
+    "bmw",
+    "chevrolet",
+    "datsun",
+    "fiat",
+    "ford",
+    "honda",
+    "hyundai",
+    "jaguar",
+    "land rover",
+    "mahindra",
+    "maruti suzuki",
+    "mercedes-benz",
+    "mitsubishi",
+    "nissan",
+    "other",
+    "renault",
+    "skoda",
+    "tata",
+    "toyota",
+    "volkswagen"
+  ],
+  "fuels": [
+    "cng",
+    "diesel",
+    "lpg",
+    "petrol"
+  ],
+  "sellers": [
+    "dealer",
+    "individual",
+    "trustmark dealer"
+  ],
+  "transmissions": [
+    "automatic",
+    "manual"
+  ],
+  "median_km": 60000,
+  "mae": 138453.1997741302,
+  "r2": 0.745379401725837,
+  "importance": {
+    "transmission_manual": 0.3296565911016314,
+    "car_age": 0.24436407513500552,
+    "fuel_diesel": 0.09522555604880362,
+    "brand_land rover": 0.054009914525166444,
+    "km_driven": 0.05166062188148615,
+    "brand_bmw": 0.0399556938716692,
+    "fuel_petrol": 0.0381947646883379,
+    "brand_mercedes-benz": 0.034860216837531946
+  }
+}

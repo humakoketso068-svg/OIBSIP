@@ -1,0 +1,8 @@
+# extra packages for running the notebook locally
+pandas
+numpy
+scikit-learn==1.9.1
+joblib
+matplotlib
+seaborn
+jupyter
